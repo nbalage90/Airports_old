@@ -29,9 +29,26 @@ namespace Airports
 
         static void TryTransormDatas()
         {
-            var pattern = "[0-9]{4},(\"[A-Za-z]*\",){5}([0-9]{1,2}\\.[0-9]{6},){2}";
+            var pattern = "^[0-9]{1,4},(\"[A-Za-z]*\",){5}([0-9]{1,3}\\.[0-9]{6},){2}";
 
-            
+            //var line = "1,\"Goroka\",\"Goroka\",\"PapuaNewGuinea\",\"GKA\",\"AYGA\",6.081689,145.391881,5282,10,\"U\"";
+            //var line2 = "1489,\"Ferihegy\",\"Budapest\",\"Hungary\",\"BUD\",\"LHBP\",47.436933,19.255592,495,1,\"E\"";
+            //Console.WriteLine(Regex.Match(line, pattern).Success);
+            //Console.WriteLine(Regex.Match(line2, pattern).Success);
+
+            using (var stream = new FileStream(@"Datas\airports.dat", FileMode.Open))
+            using (var reader = new StreamReader(stream))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (!Regex.Match(line, pattern).Success)
+                    {
+                        logger.Info($"The nex row (\"{line}\") is not match with the pattern.");
+                        continue;
+                    }
+                }
+            }
         }
     }
 }
