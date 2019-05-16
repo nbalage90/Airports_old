@@ -15,11 +15,11 @@ namespace Airports
     class Program
     {
         static Logger logger;
-        static List<Country> countries;
-        static List<City> cities;
-        static List<Location> locations;
-        static List<Airport> airports;
-        static List<AirportTimeZoneInfo> timeZones;
+        static IDictionary<string, Country> countries;
+        static IDictionary<string, City> cities;
+        static IList<Location> locations;
+        static IDictionary<int, Airport> airports;
+        static IDictionary<string, AirportTimeZoneInfo> timeZones;
 
         static void Main(string[] args)
         {
@@ -31,7 +31,7 @@ namespace Airports
 
             foreach (var airport in airports)
             {
-                FindISOCodes(airport);
+                FindISOCodes(airport.Value);
             }
 
             SerializeObjects();
@@ -40,11 +40,11 @@ namespace Airports
         static void Initialize()
         {
             logger = LogManager.GetCurrentClassLogger();
-            countries = new List<Country>();
-            cities = new List<City>();
+            countries = new Dictionary<string, Country>();
+            cities = new Dictionary<string, City>();
             locations = new List<Location>();
-            airports = new List<Airport>();
-            timeZones = new List<AirportTimeZoneInfo>();
+            airports = new Dictionary<int, Airport>();
+            timeZones = new Dictionary<string, AirportTimeZoneInfo>();
         }
 
         static bool IsOwnDataFileExsists()
@@ -90,17 +90,17 @@ namespace Airports
             var airport = new Airport
             {
                 Id = int.Parse(datas[0]),
-                Name = datas[1].ToShortString(),
+                Name = datas[1].Trim('"'),
                 FullName = GenerateFullName(datas[1]),
                 CityId = city.Id,
                 City = city,
                 CountryId = country.Id,
                 Country = country,
                 Location = location,
-                IATACode = datas[5].ToShortString(),
-                ICAOCode = datas[6].ToShortString()
+                IATACode = datas[5].Trim('"'),
+                ICAOCode = datas[6].Trim('"')
             };
-            airports.Add(airport);
+            airports.Add(airport.Id, airport);
         }
 
         static string GenerateFullName(string name)
@@ -122,15 +122,15 @@ namespace Airports
 
         static Country CreateCountry(string[] datas)
         {
-            var country = countries.SingleOrDefault(c => c.Name == datas[3].ToShortString());
+            var country = countries.SingleOrDefault(c => c.Key == datas[3].Trim('"')).Value;
             if (country == null)
             {
                 var newCountry = new Country
                 {
-                    Id = countries.Count > 0 ? countries.Max(c => c.Id) + 1 : 0,
-                    Name = datas[3].ToShortString()
+                    Id = countries.Count > 0 ? countries.Values.Max(c => c.Id) + 1 : 1,
+                    Name = datas[3].Trim('"')
                 };
-                countries.Add(newCountry);
+                countries.Add(newCountry.Name, newCountry);
                 country = newCountry;
             }
 
@@ -146,9 +146,9 @@ namespace Airports
             {
                 var newLocation = new Location
                 {
-                    Longitude = decimal.Parse(datas[6]),
-                    Latitude = decimal.Parse(datas[7]),
-                    Altitude = decimal.Parse(datas[8])
+                    Longitude = decimal.Parse(datas[6], CultureInfo.InvariantCulture),
+                    Latitude = decimal.Parse(datas[7], CultureInfo.InvariantCulture),
+                    Altitude = decimal.Parse(datas[8], CultureInfo.InvariantCulture)
                 };
 
                 locations.Add(newLocation);
@@ -160,18 +160,18 @@ namespace Airports
 
         static City CreateCity(string[] datas, Country country)
         {
-            var city = cities.SingleOrDefault(c => c.Name == datas[2].ToShortString());
+            var city = cities.SingleOrDefault(c => c.Key == datas[2].Trim('"') + "_" + country.Name).Value;
             if (city == null)
             {
                 var newCity = new City
                 {
-                    Id = cities.Count > 0 ? cities.Max(c => c.Id) + 1 : 0,
+                    Id = cities.Count > 0 ? cities.Values.Max(c => c.Id) + 1 : 1,
                     Name = datas[2],
                     CountryId = country.Id,
                     Country = country
                 };
 
-                cities.Add(newCity);
+                cities.Add(newCity.Name.Trim('"') + "_" + country.Name.Trim('"'), newCity);
                 city = newCity;
             }
 
@@ -180,27 +180,18 @@ namespace Airports
 
         static void DeserializeTimeZones()
         {
-            if (airports.Count > 0)
-            {
-                using (var sr = OpenStreamReader(@"Datas\timezoneinfo.json"))
-                {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        timeZones = JsonConvert.DeserializeObject<List<AirportTimeZoneInfo>>(line);
-                    }
-                }
-            }
+            timeZones = JsonConvert.DeserializeObject<List<AirportTimeZoneInfo>>(File.ReadAllText(@"Datas\timezoneinfo.json"))
+                        .ToDictionary(t => t.AirportId.ToString(), t => t);
         }
 
         static void LoadTimeZoneNames()
         {
-            foreach (var zone in timeZones)
+            foreach (var zone in timeZones.Values)
             {
-                var airport = airports.SingleOrDefault(a => a.Id == zone.AirportId);
+                var airport = airports.SingleOrDefault(a => a.Key == zone.AirportId).Value;
                 if (airport != null)
                 {
-                    var city = cities.Single(c => c.Id == airport.CityId);
+                    var city = cities.Single(c => c.Value.Id == airport.CityId).Value;
                     airport.TimeZoneName = zone.TimeZoneInfoId;
                     city.TimeZoneName = zone.TimeZoneInfoId; 
                 }
@@ -229,9 +220,9 @@ namespace Airports
 
         static void SerializeObjects()
         {
-            WriteObjectToFile(@"Datas\Output\airports.json", airports);
-            WriteObjectToFile(@"Datas\Output\cities.json", cities);
-            WriteObjectToFile(@"Datas\Output\countries.json", countries);
+            WriteObjectToFile(@"Datas\Output\airports.json", airports.Values);
+            WriteObjectToFile(@"Datas\Output\cities.json", cities.Values);
+            WriteObjectToFile(@"Datas\Output\countries.json", countries.Values);
             WriteObjectToFile(@"Datas\Output\locations.json", locations);
         }
 
@@ -243,6 +234,12 @@ namespace Airports
 
         static void WriteObjectToFile<T>(string path, IEnumerable<T> list) where T : class
         {
+            var folderPath = path.Substring(0, path.LastIndexOf('\\'));
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
             var sb = new StringBuilder();
             sb.Append(JsonConvert.SerializeObject(list, Formatting.Indented));
 
