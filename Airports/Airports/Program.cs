@@ -122,7 +122,7 @@ namespace Airports
 
         static Country CreateCountry(string[] datas)
         {
-            var country = countries.SingleOrDefault(c => c.Name == datas[3]);
+            var country = countries.SingleOrDefault(c => c.Name == datas[3].ToShortString());
             if (country == null)
             {
                 var newCountry = new Country
@@ -160,7 +160,7 @@ namespace Airports
 
         static City CreateCity(string[] datas, Country country)
         {
-            var city = cities.SingleOrDefault(c => c.Name == datas[2]);
+            var city = cities.SingleOrDefault(c => c.Name == datas[2].ToShortString());
             if (city == null)
             {
                 var newCity = new City
