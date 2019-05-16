@@ -32,5 +32,20 @@ namespace Airports
 
             return tokens.ToArray();
         }
+
+        public static string ToShortString(this string input)
+        {
+            if (!string.IsNullOrEmpty(input) && input.Substring(0, 1) == "\"")
+            {
+                input = input.Substring(1);
+            }
+
+            if (!string.IsNullOrEmpty(input) && input.Substring(input.Length - 1) == "\"")
+            {
+                input = input.Substring(0, input.Length - 1);
+            }
+
+            return input;
+        }
     }
 }

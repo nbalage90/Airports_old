@@ -24,7 +24,7 @@ namespace Airports
         static void Main(string[] args)
         {
             Initialize();
-            TryTransormDatas();
+            TransormDatas();
             DeserializeTimeZones();
             LoadTimeZoneNames();
             timeZones.Clear(); // na foglalja a memóriát
@@ -53,7 +53,7 @@ namespace Airports
             return false;
         }
 
-        static void TryTransormDatas()
+        static void TransormDatas()
         {
             var pattern = "^[0-9]{1,4},(\".*\",){3}(\"[A-Za-z]+\",){2}([-0-9]{1,4}(\\.[0-9]{0,})?,){2}";
 
@@ -90,15 +90,15 @@ namespace Airports
             var airport = new Airport
             {
                 Id = int.Parse(datas[0]),
-                Name = datas[1],
+                Name = datas[1].ToShortString(),
                 FullName = GenerateFullName(datas[1]),
                 CityId = city.Id,
                 City = city,
                 CountryId = country.Id,
                 Country = country,
                 Location = location,
-                IATACode = datas[5],
-                ICAOCode = datas[6]
+                IATACode = datas[5].ToShortString(),
+                ICAOCode = datas[6].ToShortString()
             };
             airports.Add(airport);
         }
@@ -128,7 +128,7 @@ namespace Airports
                 var newCountry = new Country
                 {
                     Id = countries.Count > 0 ? countries.Max(c => c.Id) + 1 : 0,
-                    Name = datas[3]
+                    Name = datas[3].ToShortString()
                 };
                 countries.Add(newCountry);
                 country = newCountry;
