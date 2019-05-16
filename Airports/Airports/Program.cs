@@ -209,14 +209,21 @@ namespace Airports
 
         static void FindISOCodes(Airport airport)
         {
-            var culture = CultureInfo.GetCultures(CultureTypes.AllCultures)
+            var culture = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
                                                     .FirstOrDefault(c => c.EnglishName.Contains(airport.Country.Name));
 
             if (culture != null)
             {
-                var regInfo = new RegionInfo(culture.Name);
-                airport.Country.TwoLetterISOCode = regInfo.TwoLetterISORegionName;
-                airport.Country.ThreeLetterISOCode = regInfo.ThreeLetterISORegionName;
+                try
+                {
+                    var regInfo = new RegionInfo(culture.Name);
+                    airport.Country.TwoLetterISOCode = regInfo.TwoLetterISORegionName;
+                    airport.Country.ThreeLetterISOCode = regInfo.ThreeLetterISORegionName;
+                }
+                catch (Exception)
+                {
+                    logger.Info($"Culture ({culture.EnglishName}) is not correct.");
+                }
             }
         }
 
