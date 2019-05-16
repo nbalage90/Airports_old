@@ -4,8 +4,10 @@ using Newtonsoft.Json;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Airports
@@ -16,11 +18,23 @@ namespace Airports
         static List<Country> countries;
         static List<City> cities;
         static List<Location> locations;
+        static List<Airport> airports;
+        static List<AirportTimeZoneInfo> timeZones;
 
         static void Main(string[] args)
         {
             Initialize();
             TryTransormDatas();
+            DeserializeTimeZones();
+            LoadTimeZoneNames();
+            timeZones.Clear(); // na foglalja a memóriát
+
+            foreach (var airport in airports)
+            {
+                FindISOCodes(airport);
+            }
+
+            SerializeObjects();
         }
 
         static void Initialize()
@@ -29,6 +43,8 @@ namespace Airports
             countries = new List<Country>();
             cities = new List<City>();
             locations = new List<Location>();
+            airports = new List<Airport>();
+            timeZones = new List<AirportTimeZoneInfo>();
         }
 
         static bool IsOwnDataFileExsists()
@@ -41,8 +57,7 @@ namespace Airports
         {
             var pattern = "^[0-9]{1,4},(\".*\",){3}(\"[A-Za-z]+\",){2}([-0-9]{1,4}(\\.[0-9]{0,})?,){2}";
 
-            using (var stream = new FileStream(@"Datas\airports.dat", FileMode.Open))
-            using (var reader = new StreamReader(stream))
+            using (var reader = OpenStreamReader(@"Datas\airports.dat"))
             {
                 string line;
                 int count = 0;
@@ -76,7 +91,7 @@ namespace Airports
             {
                 Id = int.Parse(datas[0]),
                 Name = datas[1],
-                FullName = datas[1] + " Airport",
+                FullName = datas[1] + " Airport", // TODO: még tesztelni
                 CityId = city.Id,
                 City = city,
                 CountryId = country.Id,
@@ -85,6 +100,7 @@ namespace Airports
                 IATACode = datas[5],
                 ICAOCode = datas[6]
             };
+            airports.Add(airport);
         }
 
         static Country CreateCountry(string[] datas)
@@ -147,16 +163,70 @@ namespace Airports
 
         static void DeserializeTimeZones()
         {
-            //using (resource)
-            //{
-
-            //}
-            //JsonTextReader reader = new JsonTextReader();
+            if (airports.Count > 0)
+            {
+                using (var sr = OpenStreamReader(@"Datas\timezoneinfo.json"))
+                {
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        timeZones = JsonConvert.DeserializeObject<List<AirportTimeZoneInfo>>(line);
+                    }
+                }
+            }
         }
 
-        static Stream OpenStream(string path)
+        static void LoadTimeZoneNames()
         {
+            foreach (var zone in timeZones)
+            {
+                var airport = airports.SingleOrDefault(a => a.Id == zone.AirportId);
+                if (airport != null)
+                {
+                    var city = cities.Single(c => c.Id == airport.CityId);
+                    airport.TimeZoneName = zone.TimeZoneInfoId;
+                    city.TimeZoneName = zone.TimeZoneInfoId; 
+                }
+            }
+        }
 
+        static void FindISOCodes(Airport airport)
+        {
+            var culture = CultureInfo.GetCultures(CultureTypes.AllCultures)
+                                                    .FirstOrDefault(c => c.EnglishName.Contains(airport.Country.Name));
+
+            if (culture != null)
+            {
+                var regInfo = new RegionInfo(culture.Name);
+                airport.Country.TwoLetterISOCode = regInfo.TwoLetterISORegionName;
+                airport.Country.ThreeLetterISOCode = regInfo.ThreeLetterISORegionName;
+            }
+        }
+
+        static void SerializeObjects()
+        {
+            WriteObjectToFile(@"Datas\Output\airports.json", airports);
+            WriteObjectToFile(@"Datas\Output\cities.json", cities);
+            WriteObjectToFile(@"Datas\Output\countries.json", countries);
+            WriteObjectToFile(@"Datas\Output\locations.json", locations);
+        }
+
+        static StreamReader OpenStreamReader(string path)
+        {
+            var stream = new FileStream(path, FileMode.Open);
+            return new StreamReader(stream);
+        }
+
+        static void WriteObjectToFile<T>(string path, IEnumerable<T> list) where T : class
+        {
+            var sb = new StringBuilder();
+            sb.Append(JsonConvert.SerializeObject(list, Formatting.Indented));
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            using (var streamWriter = new StreamWriter(stream))
+            {
+                streamWriter.Write(sb.ToString());
+            }
         }
     }
 }

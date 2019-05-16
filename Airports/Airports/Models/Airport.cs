@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Airports.Models
 {
+    [Serializable()]
     public class Airport
     {
         public int CityId { get; set; }
