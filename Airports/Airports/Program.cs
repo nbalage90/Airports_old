@@ -91,7 +91,7 @@ namespace Airports
             {
                 Id = int.Parse(datas[0]),
                 Name = datas[1],
-                FullName = datas[1] + " Airport", // TODO: még tesztelni
+                FullName = GenerateFullName(datas[1]),
                 CityId = city.Id,
                 City = city,
                 CountryId = country.Id,
@@ -101,6 +101,23 @@ namespace Airports
                 ICAOCode = datas[6]
             };
             airports.Add(airport);
+        }
+
+        static string GenerateFullName(string name)
+        {
+            int airtportWordLength = 7;
+            if (name.Length < airtportWordLength)
+            {
+                return name + " Airport";
+            }
+            else if (name.Substring(name.Length - airtportWordLength).ToLower() == "airport")
+            {
+                return name;
+            }
+            else
+            {
+                return name + " Airport";
+            }
         }
 
         static Country CreateCountry(string[] datas)
