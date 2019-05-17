@@ -14,6 +14,8 @@ namespace Airports
 {
     class Program
     {
+        const string FolderPath = @"Data\Output\";
+
         static Logger logger;
         static IDictionary<string, Country> countries;
         static IDictionary<string, City> cities;
@@ -24,17 +26,22 @@ namespace Airports
         static void Main(string[] args)
         {
             Initialize();
-            TransormDatas();
-            DeserializeTimeZones();
-            LoadTimeZoneNames();
-            timeZones.Clear(); // na foglalja a memóriát
-
-            foreach (var airport in airports)
+            if (!IsOwnDataFileExsists())
             {
-                FindISOCodes(airport.Value);
+                TransormDatas();
+                DeserializeTimeZones();
+                LoadTimeZoneNames();
+                timeZones.Clear(); // na foglalja a memóriát
+
+                foreach (var airport in airports)
+                {
+                    FindISOCodes(airport.Value);
+                }
+
+                SerializeObjects();
             }
 
-            SerializeObjects();
+            
         }
 
         static void Initialize()
@@ -49,9 +56,22 @@ namespace Airports
 
         static bool IsOwnDataFileExsists()
         {
-            //TODO: IsOwnDataFileExsists
+            if (!Directory.Exists(FolderPath))
+            {
+                return false;
+            }
+
+            if (!File.Exists(FolderPath + @"airports.json") ||
+                !File.Exists(FolderPath + @"cities.json") ||
+                !File.Exists(FolderPath + @"countries.json") ||
+                !File.Exists(FolderPath + @"locations.json"))
+            {
+                return false;
+            }
             return false;
         }
+
+        #region ReadData
 
         static void TransormDatas()
         {
@@ -220,10 +240,10 @@ namespace Airports
 
         static void SerializeObjects()
         {
-            WriteObjectToFile(@"Datas\Output\airports.json", airports.Values);
-            WriteObjectToFile(@"Datas\Output\cities.json", cities.Values);
-            WriteObjectToFile(@"Datas\Output\countries.json", countries.Values);
-            WriteObjectToFile(@"Datas\Output\locations.json", locations);
+            WriteObjectToFile(FolderPath + @"airports.json", airports.Values);
+            WriteObjectToFile(FolderPath + @"cities.json", cities.Values);
+            WriteObjectToFile(FolderPath + @"countries.json", countries.Values);
+            WriteObjectToFile(FolderPath + @"locations.json", locations);
         }
 
         static StreamReader OpenStreamReader(string path)
@@ -249,5 +269,7 @@ namespace Airports
                 streamWriter.Write(sb.ToString());
             }
         }
+
+        #endregion
     }
 }
