@@ -14,7 +14,8 @@ namespace Airports
 {
     class Program
     {
-        const string FolderPath = @"Data\Output\";
+        const string InputFolderPath = @"Data\";
+        const string OutputFolderPath = @"Data\Output\";
 
         static Logger logger;
         static IDictionary<string, Country> countries;
@@ -22,6 +23,13 @@ namespace Airports
         static IList<Location> locations;
         static IDictionary<int, Airport> airports;
         static IDictionary<string, AirportTimeZoneInfo> timeZones;
+        static string[] FileNames =
+        {
+            "airports.json",
+            "cities.json",
+            "countries.json",
+            "locations.json"
+        };
 
         static void Main(string[] args)
         {
@@ -40,8 +48,11 @@ namespace Airports
 
                 SerializeObjects();
             }
+            else
+            {
+                ReadImportedFiles();
+            }
 
-            
         }
 
         static void Initialize()
@@ -56,19 +67,22 @@ namespace Airports
 
         static bool IsOwnDataFileExsists()
         {
-            if (!Directory.Exists(FolderPath))
+            if (!Directory.Exists(OutputFolderPath))
             {
                 return false;
             }
 
-            if (!File.Exists(FolderPath + @"airports.json") ||
-                !File.Exists(FolderPath + @"cities.json") ||
-                !File.Exists(FolderPath + @"countries.json") ||
-                !File.Exists(FolderPath + @"locations.json"))
+            bool filesExsist = true;
+
+            foreach (var path in FileNames)
             {
-                return false;
+                if (!File.Exists(OutputFolderPath + path))
+                {
+                    filesExsist = false;
+                }
             }
-            return false;
+
+            return filesExsist;
         }
 
         #region ReadData
@@ -77,7 +91,7 @@ namespace Airports
         {
             var pattern = "^[0-9]{1,4},(\".*\",){3}(\"[A-Za-z]+\",){2}([-0-9]{1,4}(\\.[0-9]{0,})?,){2}";
 
-            using (var reader = OpenStreamReader(@"Datas\airports.dat"))
+            using (var reader = OpenStreamReader(InputFolderPath + @"airports.dat"))
             {
                 string line;
                 int count = 0;
@@ -111,7 +125,7 @@ namespace Airports
             {
                 Id = int.Parse(datas[0]),
                 Name = datas[1].Trim('"'),
-                FullName = GenerateFullName(datas[1]),
+                FullName = GenerateFullName(datas[1].Trim('"')),
                 CityId = city.Id,
                 City = city,
                 CountryId = country.Id,
@@ -186,7 +200,7 @@ namespace Airports
                 var newCity = new City
                 {
                     Id = cities.Count > 0 ? cities.Values.Max(c => c.Id) + 1 : 1,
-                    Name = datas[2],
+                    Name = datas[2].Trim('"'),
                     CountryId = country.Id,
                     Country = country
                 };
@@ -200,7 +214,7 @@ namespace Airports
 
         static void DeserializeTimeZones()
         {
-            timeZones = JsonConvert.DeserializeObject<List<AirportTimeZoneInfo>>(File.ReadAllText(@"Datas\timezoneinfo.json"))
+            timeZones = JsonConvert.DeserializeObject<List<AirportTimeZoneInfo>>(File.ReadAllText(InputFolderPath + @"timezoneinfo.json"))
                         .ToDictionary(t => t.AirportId.ToString(), t => t);
         }
 
@@ -213,7 +227,7 @@ namespace Airports
                 {
                     var city = cities.Single(c => c.Value.Id == airport.CityId).Value;
                     airport.TimeZoneName = zone.TimeZoneInfoId;
-                    city.TimeZoneName = zone.TimeZoneInfoId; 
+                    city.TimeZoneName = zone.TimeZoneInfoId;
                 }
             }
         }
@@ -240,10 +254,18 @@ namespace Airports
 
         static void SerializeObjects()
         {
-            WriteObjectToFile(FolderPath + @"airports.json", airports.Values);
-            WriteObjectToFile(FolderPath + @"cities.json", cities.Values);
-            WriteObjectToFile(FolderPath + @"countries.json", countries.Values);
-            WriteObjectToFile(FolderPath + @"locations.json", locations);
+            WriteObjectToFile(OutputFolderPath + @"airports.json", airports.Values);
+            WriteObjectToFile(OutputFolderPath + @"cities.json", cities.Values);
+            WriteObjectToFile(OutputFolderPath + @"countries.json", countries.Values);
+            WriteObjectToFile(OutputFolderPath + @"locations.json", locations);
+        }
+
+        static void ReadImportedFiles()
+        {
+            airports = JsonConvert.DeserializeObject<List<Airport>>(File.ReadAllText(OutputFolderPath + "airports.json")).ToDictionary(a => a.Id, a => a);
+            cities = JsonConvert.DeserializeObject<List<City>>(File.ReadAllText(OutputFolderPath + "cities.json")).ToDictionary(a => a.Name + "_" + a.Country.Name, a => a);
+            countries = JsonConvert.DeserializeObject<List<Country>>(File.ReadAllText(OutputFolderPath + "countries.json")).ToDictionary(a => a.Name, a => a);
+            locations = JsonConvert.DeserializeObject<List<Location>>(File.ReadAllText(OutputFolderPath + "locations.json"));
         }
 
         static StreamReader OpenStreamReader(string path)
