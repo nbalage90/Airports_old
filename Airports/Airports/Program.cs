@@ -73,16 +73,16 @@ namespace Airports
             double longitude = 0, latitude = 0;
             string longit = string.Empty, latit = string.Empty;
 
-            //while (!airportManager.IsCoordinateValid(longit) ||
-            //       !airportManager.IsCoordinateValid(latit) || 
-            //       !double.TryParse(longit, out longitude) || !double.TryParse(latit, out latitude))
-            //{
-            //    Console.WriteLine("Please enter a longitude value:");
-            //    longit = Console.ReadLine();
+            while (!airportManager.IsCoordinateValid(longit) ||
+                   !airportManager.IsCoordinateValid(latit) ||
+                   !double.TryParse(longit, out longitude) || !double.TryParse(latit, out latitude))
+            {
+                Console.WriteLine("Please enter a longitude value:");
+                longit = Console.ReadLine();
 
-            //    Console.WriteLine("Please enter a latitude value:");
-            //    latit = Console.ReadLine();
-            //}
+                Console.WriteLine("Please enter a latitude value:");
+                latit = Console.ReadLine();
+            }
 
             var nearest = airportManager.NearestAirport(longitude, latitude);
             Console.WriteLine($"{nearest.Name} ({nearest.City.Name} [{nearest.Country.Name}])");

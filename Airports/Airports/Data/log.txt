@@ -14674,3 +14674,11 @@
 2019/05/20 11:08:40.183|INFO|The next row ("9093,"Salt Lake City Intermodal Hub","Salt Lake City","United States","","SLCR",40.762778,-111.908333,0,-7,"A"") is not match with the pattern. |Airports.Program|
 2019/05/20 11:08:40.183|INFO|The next row ("9094,"Thorny Bush Game Lodge Airport","Hoedspruit","South Africa","",\N,-24.414722,31.165001,1900,2,"U"") is not match with the pattern. |Airports.Program|
 2019/05/20 11:08:40.183|INFO|There was 2279 elements, wich not matched with the pattern. |Airports.Program|
+2019-05-20 12:26:58.2385 Info Message Template Auto Format enabled
+2019-05-20 12:26:58.3193 Info Adding target FileTarget(Name=target1)
+2019-05-20 12:26:58.3193 Info Adding target ConsoleTarget(Name=target2)
+2019-05-20 12:26:58.3533 Info Found 33 configuration items
+2019-05-20 12:26:58.3533 Info Configuration initialized.
+2019-05-20 12:26:58.3700 Info NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 4.6.3.9764. Product version: 4.6.3.
+2019-05-20 12:27:02.2302 Info AppDomain Shutting down. Logger closing...
+2019-05-20 12:27:02.2658 Info Logger has been shut down.
