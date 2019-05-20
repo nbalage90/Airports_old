@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Elect.Location.Coordinate.DistanceUtils;
+using System.Text.RegularExpressions;
 
 namespace Airports
 {
@@ -50,6 +51,25 @@ namespace Airports
             }
 
             return airport;
+        }
+
+        public bool IsCoordinateValid(string coordinate)
+        {
+            var pattern = "[0-9]{1,3}\\.?[0-9]*";
+
+            return Regex.Match(coordinate, pattern).Success;
+        }
+
+        public Airport GetAirportByIATACode(string code)
+        {
+            return airports.SingleOrDefault(a => a.IATACode.Trim() == code.Trim());
+        }
+
+        public bool IsIATACodeValid(string code)
+        {
+            var pattern = "[A-Z]{3}";
+
+            return Regex.Match(code, pattern).Success;
         }
     }
 }

@@ -54,31 +54,57 @@ namespace Airports
             }
 
             var airportManager = new AirportManager(airports.Values);
+
+            // Countries and counts
             var countrylist = airportManager.CountryList();
             foreach (var c in countrylist)
             {
                 Console.WriteLine(c);
             }
+
+            // Cities has the most aiports
             var cityList = airportManager.CitiesByAirportCount();
             foreach (var c in cityList)
             {
                 Console.WriteLine(c);
             }
 
+            // Closest airport
             double longitude = 0, latitude = 0;
             string longit = string.Empty, latit = string.Empty;
 
-            while (!double.TryParse(longit, out longitude) || !double.TryParse(latit, out latitude))
-            {
-                Console.WriteLine("Please enter a longitude value:");
-                longit = Console.ReadLine();
+            //while (!airportManager.IsCoordinateValid(longit) ||
+            //       !airportManager.IsCoordinateValid(latit) || 
+            //       !double.TryParse(longit, out longitude) || !double.TryParse(latit, out latitude))
+            //{
+            //    Console.WriteLine("Please enter a longitude value:");
+            //    longit = Console.ReadLine();
 
-                Console.WriteLine("Please enter a latitude value:");
-                latit = Console.ReadLine();
-            }
+            //    Console.WriteLine("Please enter a latitude value:");
+            //    latit = Console.ReadLine();
+            //}
 
             var nearest = airportManager.NearestAirport(longitude, latitude);
             Console.WriteLine($"{nearest.Name} ({nearest.City.Name} [{nearest.Country.Name}])");
+
+            // IATA code
+            var iata = string.Empty;
+
+            while (!airportManager.IsIATACodeValid(iata))
+            {
+                Console.WriteLine("Please enter an IATA code:");
+                iata = Console.ReadLine();
+            }
+
+            var iataAirport = airportManager.GetAirportByIATACode(iata);
+            if (iataAirport == null)
+            {
+                Console.WriteLine("No airport found!");
+            }
+            else
+            {
+                Console.WriteLine($"{iataAirport.Name} ({iataAirport.City.Name} [{iataAirport.Country.Name}])");
+            }
 
             Console.ReadKey();
         }
@@ -159,8 +185,8 @@ namespace Airports
                 CountryId = country.Id,
                 Country = country,
                 Location = location,
-                IATACode = data[5].Trim('"'),
-                ICAOCode = data[6].Trim('"')
+                IATACode = data[4].Trim('"'),
+                ICAOCode = data[5].Trim('"')
             };
             airports.Add(airport.Id, airport);
         }
