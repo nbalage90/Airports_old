@@ -35,6 +35,10 @@ namespace Airports
             }
 
             SerializeObjects();
+
+            var airportManager = new AirportManager();
+            airportManager.CountryList(airports);
+            airportManager.CitiesByAirportCount(airports);
         }
 
         static void Initialize()
