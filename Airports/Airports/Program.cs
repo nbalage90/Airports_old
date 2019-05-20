@@ -53,17 +53,32 @@ namespace Airports
                 ReadImportedFiles();
             }
 
-            var airportManager = new AirportManager();
-            var countrylist = airportManager.CountryList(airports.Values);
+            var airportManager = new AirportManager(airports.Values);
+            var countrylist = airportManager.CountryList();
             foreach (var c in countrylist)
             {
                 Console.WriteLine(c);
             }
-            var cityList = airportManager.CitiesByAirportCount(airports.Values);
+            var cityList = airportManager.CitiesByAirportCount();
             foreach (var c in cityList)
             {
                 Console.WriteLine(c);
             }
+
+            double longitude = 0, latitude = 0;
+            string longit = string.Empty, latit = string.Empty;
+
+            while (!double.TryParse(longit, out longitude) || !double.TryParse(latit, out latitude))
+            {
+                Console.WriteLine("Please enter a longitude value:");
+                longit = Console.ReadLine();
+
+                Console.WriteLine("Please enter a latitude value:");
+                latit = Console.ReadLine();
+            }
+
+            var nearest = airportManager.NearestAirport(longitude, latitude);
+            Console.WriteLine($"{nearest.Name} ({nearest.City.Name} [{nearest.Country.Name}])");
 
             Console.ReadKey();
         }
