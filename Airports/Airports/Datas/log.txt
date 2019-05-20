@@ -1,0 +1,22 @@
+2019-05-20 11:18:32.5557 Info Message Template Auto Format enabled
+2019-05-20 11:18:32.6275 Info Adding target FileTarget(Name=target1)
+2019-05-20 11:18:32.6275 Info Adding target ConsoleTarget(Name=target2)
+2019-05-20 11:18:32.6605 Info Found 33 configuration items
+2019-05-20 11:18:32.6691 Info Configuration initialized.
+2019-05-20 11:18:32.6691 Info NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 4.6.3.9764. Product version: 4.6.3.
+2019-05-20 11:18:36.2878 Info AppDomain Shutting down. Logger closing...
+2019-05-20 11:18:36.3235 Info Logger has been shut down.
+2019-05-20 11:19:58.6669 Info Message Template Auto Format enabled
+2019-05-20 11:19:58.7485 Info Adding target FileTarget(Name=target1)
+2019-05-20 11:19:58.7485 Info Adding target ConsoleTarget(Name=target2)
+2019-05-20 11:19:58.7859 Info Found 33 configuration items
+2019-05-20 11:19:58.7957 Info Configuration initialized.
+2019-05-20 11:19:58.7957 Info NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 4.6.3.9764. Product version: 4.6.3.
+2019-05-20 11:20:27.7737 Info Message Template Auto Format enabled
+2019-05-20 11:20:27.8638 Info Adding target FileTarget(Name=target1)
+2019-05-20 11:20:27.8638 Info Adding target ConsoleTarget(Name=target2)
+2019-05-20 11:20:27.8979 Info Found 33 configuration items
+2019-05-20 11:20:27.9070 Info Configuration initialized.
+2019-05-20 11:20:27.9070 Info NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 4.6.3.9764. Product version: 4.6.3.
+2019-05-20 11:20:44.2172 Info AppDomain Shutting down. Logger closing...
+2019-05-20 11:20:44.2491 Info Logger has been shut down.

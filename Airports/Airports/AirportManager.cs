@@ -10,13 +10,10 @@ namespace Airports
     {
         public IDictionary<string, int> CountryList(IEnumerable<Airport> airports)
         {
-            var resultDictionary = new Dictionary<string, int>();
-
-            var x = airports.OrderBy(a => a.Country.Name)
+            return airports.OrderBy(a => a.Country.Name)
                             .GroupBy(a => a.Country.Name)
+                            .Select(a => a.Key)
                             .ToDictionary(a => a, a => a.Count());
-
-            return resultDictionary;
         }
 
         public IEnumerable<string> CitiesByAirportCount(IEnumerable<Airport> airports)
@@ -26,8 +23,8 @@ namespace Airports
                                .Select(a => new { CityName = a.Key, Count = a.Count() });
                                //.ToDictionary(a => a, a => a.Count());
 
-            var max = dict.Max(a => a.CityName);
-            return dict.Where(d => d.CityName == max).Select(d => d.CityName);
+            var max = dict.Max(a => a.Count);
+            return dict.Where(d => d.Count == max).Select(d => d.CityName);
         }
     }
 }

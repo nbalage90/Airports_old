@@ -36,7 +36,7 @@ namespace Airports
             Initialize();
             if (!IsOwnDataFileExsists())
             {
-                TransormDatas();
+                TransormData();
                 DeserializeTimeZones();
                 LoadTimeZoneNames();
                 timeZones.Clear(); // na foglalja a memóriát
@@ -53,6 +53,19 @@ namespace Airports
                 ReadImportedFiles();
             }
 
+            var airportManager = new AirportManager();
+            var countrylist = airportManager.CountryList(airports.Values);
+            foreach (var c in countrylist)
+            {
+                Console.WriteLine(c);
+            }
+            var cityList = airportManager.CitiesByAirportCount(airports.Values);
+            foreach (var c in cityList)
+            {
+                Console.WriteLine(c);
+            }
+
+            Console.ReadKey();
         }
 
         static void Initialize()
@@ -87,7 +100,7 @@ namespace Airports
 
         #region ReadData
 
-        static void TransormDatas()
+        static void TransormData()
         {
             var pattern = "^[0-9]{1,4},(\".*\",){3}(\"[A-Za-z]+\",){2}([-0-9]{1,4}(\\.[0-9]{0,})?,){2}";
 
@@ -113,26 +126,26 @@ namespace Airports
 
         static void CreateAirport(string line)
         {
-            var datas = line.AirportSplit(',');
+            var data = line.AirportSplit(',');
 
-            var country = CreateCountry(datas);
+            var country = CreateCountry(data);
 
-            var city = CreateCity(datas, country);
+            var city = CreateCity(data, country);
 
-            var location = CreateLocation(datas);
+            var location = CreateLocation(data);
 
             var airport = new Airport
             {
-                Id = int.Parse(datas[0]),
-                Name = datas[1].Trim('"'),
-                FullName = GenerateFullName(datas[1].Trim('"')),
+                Id = int.Parse(data[0]),
+                Name = data[1].Trim('"'),
+                FullName = GenerateFullName(data[1].Trim('"')),
                 CityId = city.Id,
                 City = city,
                 CountryId = country.Id,
                 Country = country,
                 Location = location,
-                IATACode = datas[5].Trim('"'),
-                ICAOCode = datas[6].Trim('"')
+                IATACode = data[5].Trim('"'),
+                ICAOCode = data[6].Trim('"')
             };
             airports.Add(airport.Id, airport);
         }
@@ -154,15 +167,15 @@ namespace Airports
             }
         }
 
-        static Country CreateCountry(string[] datas)
+        static Country CreateCountry(string[] data)
         {
-            var country = countries.SingleOrDefault(c => c.Key == datas[3].Trim('"')).Value;
+            var country = countries.SingleOrDefault(c => c.Key == data[3].Trim('"')).Value;
             if (country == null)
             {
                 var newCountry = new Country
                 {
                     Id = countries.Count > 0 ? countries.Values.Max(c => c.Id) + 1 : 1,
-                    Name = datas[3].Trim('"')
+                    Name = data[3].Trim('"')
                 };
                 countries.Add(newCountry.Name, newCountry);
                 country = newCountry;
@@ -171,18 +184,18 @@ namespace Airports
             return country;
         }
 
-        static Location CreateLocation(string[] datas)
+        static Location CreateLocation(string[] data)
         {
-            var location = locations.SingleOrDefault(l => l.Longitude.ToString() == datas[6]
-                                              && l.Latitude.ToString() == datas[7]
-                                              && l.Altitude.ToString() == datas[8]);
+            var location = locations.SingleOrDefault(l => l.Longitude.ToString() == data[6]
+                                              && l.Latitude.ToString() == data[7]
+                                              && l.Altitude.ToString() == data[8]);
             if (location == null)
             {
                 var newLocation = new Location
                 {
-                    Longitude = decimal.Parse(datas[6], CultureInfo.InvariantCulture),
-                    Latitude = decimal.Parse(datas[7], CultureInfo.InvariantCulture),
-                    Altitude = decimal.Parse(datas[8], CultureInfo.InvariantCulture)
+                    Longitude = decimal.Parse(data[6], CultureInfo.InvariantCulture),
+                    Latitude = decimal.Parse(data[7], CultureInfo.InvariantCulture),
+                    Altitude = decimal.Parse(data[8], CultureInfo.InvariantCulture)
                 };
 
                 locations.Add(newLocation);
@@ -192,15 +205,15 @@ namespace Airports
             return location;
         }
 
-        static City CreateCity(string[] datas, Country country)
+        static City CreateCity(string[] data, Country country)
         {
-            var city = cities.SingleOrDefault(c => c.Key == datas[2].Trim('"') + "_" + country.Name).Value;
+            var city = cities.SingleOrDefault(c => c.Key == data[2].Trim('"') + "_" + country.Name).Value;
             if (city == null)
             {
                 var newCity = new City
                 {
                     Id = cities.Count > 0 ? cities.Values.Max(c => c.Id) + 1 : 1,
-                    Name = datas[2].Trim('"'),
+                    Name = data[2].Trim('"'),
                     CountryId = country.Id,
                     Country = country
                 };
