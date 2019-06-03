@@ -18,6 +18,11 @@ namespace Airports
 
         static void Main(string[] args)
         {
+            var v = CsvHelper.Parse<Airline>(@"Data\airlines.dat");
+
+
+
+
             loadManager = new LoadManager();
 
             if (!loadManager.IsOwnDataFileExsists())
