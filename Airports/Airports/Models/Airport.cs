@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Airports.Models
@@ -13,12 +14,16 @@ namespace Airports.Models
 
         public string FullName { get; set; }
 
+        [Column("iata")]
         public string IATACode { get; set; }
 
+        [Column("icao")]
         public string ICAOCode { get; set; }
 
+        [Column("id")]
         public int Id { get; set; }
 
+        [Column("airport")]
         public string Name { get; set; }
 
         public string TimeZoneName { get; set; }

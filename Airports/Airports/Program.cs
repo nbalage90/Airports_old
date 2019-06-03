@@ -18,7 +18,7 @@ namespace Airports
 
         static void Main(string[] args)
         {
-            var v = CsvHelper.Parse<Airline>(@"Data\airlines.dat");
+            //var v = CsvHelper.Parse<Airline>(@"Data\airlines.dat");
 
 
 
@@ -41,66 +41,60 @@ namespace Airports
                 loadManager.ReadImportedFiles();
             }
 
-            var airportManager = new AirportManager(loadManager.Airports.Values);
+            //var airportManager = new AirportManager(loadManager.Airports.Values);
 
-            // Countries and counts
-            var countrylist = airportManager.CountryList();
-            foreach (var c in countrylist)
-            {
-                Console.WriteLine(c);
-            }
+            //// Countries and counts
+            //var countrylist = airportManager.CountryList();
+            //foreach (var c in countrylist)
+            //{
+            //    Console.WriteLine(c);
+            //}
 
-            // Cities has the most aiports
-            var cityList = airportManager.CitiesByAirportCount();
-            foreach (var c in cityList)
-            {
-                Console.WriteLine(c);
-            }
+            //// Cities has the most aiports
+            //var cityList = airportManager.CitiesByAirportCount();
+            //foreach (var c in cityList)
+            //{
+            //    Console.WriteLine(c);
+            //}
 
-            // Closest airport
-            double longitude = 0, latitude = 0;
-            string longit = string.Empty, latit = string.Empty;
+            //// Closest airport
+            //double longitude = 0, latitude = 0;
+            //string longit = string.Empty, latit = string.Empty;
 
-            while (!airportManager.IsCoordinateValid(longit) ||
-                   !airportManager.IsCoordinateValid(latit) ||
-                   !double.TryParse(longit, out longitude) || !double.TryParse(latit, out latitude))
-            {
-                Console.WriteLine("Please enter a longitude value:");
-                longit = Console.ReadLine();
+            //while (!airportManager.IsCoordinateValid(longit) ||
+            //       !airportManager.IsCoordinateValid(latit) ||
+            //       !double.TryParse(longit, out longitude) || !double.TryParse(latit, out latitude))
+            //{
+            //    Console.WriteLine("Please enter a longitude value:");
+            //    longit = Console.ReadLine();
 
-                Console.WriteLine("Please enter a latitude value:");
-                latit = Console.ReadLine();
-            }
+            //    Console.WriteLine("Please enter a latitude value:");
+            //    latit = Console.ReadLine();
+            //}
 
-            var nearest = airportManager.NearestAirport(longitude, latitude);
-            Console.WriteLine($"{nearest.Name} ({nearest.City.Name} [{nearest.Country.Name}])");
+            //var nearest = airportManager.NearestAirport(longitude, latitude);
+            //Console.WriteLine($"{nearest.Name} ({nearest.City.Name} [{nearest.Country.Name}])");
 
-            // IATA code
-            var iata = string.Empty;
+            //// IATA code
+            //var iata = string.Empty;
 
-            while (!airportManager.IsIATACodeValid(iata))
-            {
-                Console.WriteLine("Please enter an IATA code:");
-                iata = Console.ReadLine();
-            }
+            //while (!airportManager.IsIATACodeValid(iata))
+            //{
+            //    Console.WriteLine("Please enter an IATA code:");
+            //    iata = Console.ReadLine();
+            //}
 
-            var iataAirport = airportManager.GetAirportByIATACode(iata);
-            if (iataAirport == null)
-            {
-                Console.WriteLine("No airport found!");
-            }
-            else
-            {
-                Console.WriteLine($"{iataAirport.Name} ({iataAirport.City.Name} [{iataAirport.Country.Name}])");
-            }
+            //var iataAirport = airportManager.GetAirportByIATACode(iata);
+            //if (iataAirport == null)
+            //{
+            //    Console.WriteLine("No airport found!");
+            //}
+            //else
+            //{
+            //    Console.WriteLine($"{iataAirport.Name} ({iataAirport.City.Name} [{iataAirport.Country.Name}])");
+            //}
 
             Console.ReadKey();
         }
-
-        #region ReadData
-
-        
-
-        #endregion
     }
 }

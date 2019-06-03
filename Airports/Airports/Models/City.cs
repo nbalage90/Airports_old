@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Airports.Models
@@ -10,6 +11,7 @@ namespace Airports.Models
 
         public int Id { get; set; }
 
+        [Column("city")]
         public string Name { get; set; }
 
         public string TimeZoneName { get; set; }

@@ -44,7 +44,7 @@ namespace Airports
 
         private static string[] GetColumns(string line)
         {
-            return line.Split(',');
+            return line.AirportSplit(',');
         }
         
         private static T CreateObject<T>(string[] columnNames, string[] columns) where T : class
@@ -56,7 +56,10 @@ namespace Airports
             for (int i = 0; i < columnNames.Length; i++)
             {
                 var prop = GetColumnName(type, columnNames[i]);
-                prop.SetValue(instance, Convert.ChangeType(columns[i], prop.PropertyType));
+                if (prop != null)
+                {
+                    prop.SetValue(instance, Convert.ChangeType(columns[i].Trim('"'), prop.PropertyType)); 
+                }
             }
 
             return instance as T;
